@@ -27,18 +27,88 @@ set(WHISPER_SRC_DIR "${WHISPER_ROOT_DIR}/src")
 set(GGML_ROOT_DIR "${WHISPER_ROOT_DIR}/ggml")
 set(JSON_ROOT_DIR "${PLATFORM_SHARED_ROOT}/json")
 
+# ----------------------------------------------------------------------
+# Opt-in acceleration backends.
+#
+# All three are off by default except OPENMP, which is enabled because
+# libgomp ships as part of GCC's runtime on essentially every Linux
+# distribution and gives a free CPU speedup with no extra build deps.
+#
+# Override at configure time either via a CMake cache variable or an
+# environment variable of the same name. The env var form is the
+# easiest way to flip these from a Flutter build:
+#
+#   WHISPER_GGML_PLUS_LINUX_VULKAN=ON \
+#   WHISPER_GGML_PLUS_LINUX_OPENMP=ON \
+#     flutter build linux --release
+#
+# Build-time requirements:
+#   OPENMP : libgomp.so.1 (usually provided by gcc/g++/libgomp1).
+#   VULKAN : Vulkan headers and loader (libvulkan-dev / vulkan-devel)
+#            and a GLSL compiler (glslc from shaderc or
+#            glslangValidator) on PATH for shader compilation.
+#   CUDA   : NVIDIA CUDA Toolkit (nvcc, cuBLAS dev headers, etc.).
+#
+# Runtime requirements:
+#   OPENMP : libgomp.so.1 on the loader path.
+#   VULKAN : libvulkan.so.1 plus a working Vulkan ICD (mesa, NVIDIA,
+#            etc.).
+#   CUDA   : NVIDIA driver and a compatible GPU. Without these the
+#            plugin .so will fail to load on the target machine.
+# ----------------------------------------------------------------------
+foreach(_acc OPENMP VULKAN CUDA)
+  set(_var "WHISPER_GGML_PLUS_LINUX_${_acc}")
+  if(DEFINED ENV{${_var}})
+    set(${_var}_DEFAULT $ENV{${_var}})
+  elseif(_acc STREQUAL "OPENMP")
+    set(${_var}_DEFAULT ON)
+  else()
+    set(${_var}_DEFAULT OFF)
+  endif()
+  option(${_var}
+    "Enable ${_acc} backend in libwhisper_ggml_plus.so"
+    ${${_var}_DEFAULT}
+  )
+endforeach()
+
+message(STATUS "whisper_ggml_plus linux acceleration:"
+  " OPENMP=${WHISPER_GGML_PLUS_LINUX_OPENMP}"
+  " VULKAN=${WHISPER_GGML_PLUS_LINUX_VULKAN}"
+  " CUDA=${WHISPER_GGML_PLUS_LINUX_CUDA}"
+)
+
 # Build the vendored libraries as static archives and link them into one
 # self-contained libwhisper_ggml_plus.so. Matches the Windows plugin.
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build vendored libs static" FORCE)
 set(GGML_METAL OFF CACHE BOOL "Disable Metal backend on Linux" FORCE)
 set(GGML_ACCELERATE OFF CACHE BOOL "Disable Accelerate on Linux" FORCE)
 set(GGML_BLAS OFF CACHE BOOL "Disable BLAS auto-linking on Linux" FORCE)
-set(GGML_OPENMP OFF CACHE BOOL "Disable OpenMP for initial Linux support" FORCE)
 set(GGML_BACKEND_DL OFF CACHE BOOL "Disable dynamic ggml backends" FORCE)
 set(WHISPER_COREML OFF CACHE BOOL "Disable CoreML on Linux" FORCE)
 set(WHISPER_OPENVINO OFF CACHE BOOL "Disable OpenVINO on Linux" FORCE)
 set(WHISPER_ALL_WARNINGS OFF CACHE BOOL "Use default warnings" FORCE)
 set(GGML_ALL_WARNINGS OFF CACHE BOOL "Use default warnings" FORCE)
+
+# Plumb the opt-ins into ggml's own cache variables. With
+# GGML_BACKEND_DL=OFF, each enabled backend is statically linked into
+# libwhisper_ggml_plus.so so there are no extra runtime files to ship
+# beyond the plugin .so itself (the ICDs / drivers remain external).
+if(WHISPER_GGML_PLUS_LINUX_OPENMP)
+  set(GGML_OPENMP ON  CACHE BOOL "Enable OpenMP threading in ggml" FORCE)
+else()
+  set(GGML_OPENMP OFF CACHE BOOL "Disable OpenMP threading in ggml" FORCE)
+endif()
+
+if(WHISPER_GGML_PLUS_LINUX_VULKAN)
+  set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan backend in ggml" FORCE)
+endif()
+
+if(WHISPER_GGML_PLUS_LINUX_CUDA)
+  # CUDA needs its own toolchain enabled before ggml's add_subdirectory
+  # call. This will fail-fast with a clear error if nvcc is missing.
+  enable_language(CUDA)
+  set(GGML_CUDA ON CACHE BOOL "Enable CUDA backend in ggml" FORCE)
+endif()
 
 add_compile_definitions(
   WHISPER_VERSION="1.8.3"
