@@ -65,6 +65,7 @@ struct whisper_params {
 
     std::string language = "id";
     std::string prompt;
+    std::string initial_prompt;
     std::string model = "";
     std::string audio = "";
     std::string vad_model_path = "";
@@ -143,6 +144,7 @@ static json transcribe(const json & json_body) {
     params.speed_up = json_body["speed_up"];
     params.vad_mode = parse_vad_mode(json_body);
     params.vad_model_path = json_body.value("vad_model_path", std::string(""));
+    params.initial_prompt = json_body.value("initial_prompt", std::string(""));
 
     json json_result;
     json_result["@type"] = "transcribe";
@@ -246,6 +248,10 @@ static json transcribe(const json & json_body) {
 
     wparams.abort_callback = abort_callback;
     wparams.abort_callback_user_data = nullptr;
+
+    if (!params.initial_prompt.empty()) {
+        wparams.initial_prompt = params.initial_prompt.c_str();
+    }
 
     std::fprintf(stderr,
                  "[DEBUG] Transcription params - threads: %d, speed_up: %d, no_timestamps: %d, single_segment: %d, split_on_word: %d, max_len: %d\n",

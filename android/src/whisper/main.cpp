@@ -64,6 +64,7 @@ struct whisper_params
 
     std::string language = "id";
     std::string prompt;
+    std::string initial_prompt;
     std::string model = "";
     std::string audio = "";
     std::string vad_model_path = "";
@@ -141,6 +142,7 @@ json transcribe(json jsonBody)
     params.speed_up = jsonBody["speed_up"];
     params.vad_mode = parse_vad_mode(jsonBody);
     params.vad_model_path = jsonBody.value("vad_model_path", std::string(""));
+    params.initial_prompt = jsonBody.value("initial_prompt", std::string(""));
 
     json jsonResult;
     jsonResult["@type"] = "transcribe";
@@ -240,6 +242,10 @@ json transcribe(json jsonBody)
     
     wparams.abort_callback = abort_callback;
     wparams.abort_callback_user_data = nullptr;
+
+    if (!params.initial_prompt.empty()) {
+        wparams.initial_prompt = params.initial_prompt.c_str();
+    }
 
     __android_log_print(ANDROID_LOG_DEBUG, "WhisperFlutter",
                         "[DEBUG] Transcription params - threads: %d, speed_up: %d, no_timestamps: %d, single_segment: %d, split_on_word: %d, max_len: %d",

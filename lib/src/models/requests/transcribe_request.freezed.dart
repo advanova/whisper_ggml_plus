@@ -28,6 +28,7 @@ mixin _$TranscribeRequest {
   bool get diarize;
   bool get speedUp;
   WhisperVadMode get vadMode;
+  String? get initialPrompt;
   String? get vadModelPath;
   Stream<String>? get realtimeStream;
 
@@ -67,6 +68,8 @@ mixin _$TranscribeRequest {
             (identical(other.diarize, diarize) || other.diarize == diarize) &&
             (identical(other.speedUp, speedUp) || other.speedUp == speedUp) &&
             (identical(other.vadMode, vadMode) || other.vadMode == vadMode) &&
+            (identical(other.initialPrompt, initialPrompt) ||
+                other.initialPrompt == initialPrompt) &&
             (identical(other.vadModelPath, vadModelPath) ||
                 other.vadModelPath == vadModelPath) &&
             (identical(other.realtimeStream, realtimeStream) ||
@@ -90,12 +93,13 @@ mixin _$TranscribeRequest {
       diarize,
       speedUp,
       vadMode,
+      initialPrompt,
       vadModelPath,
       realtimeStream);
 
   @override
   String toString() {
-    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
+    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, initialPrompt: $initialPrompt, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
   }
 }
 
@@ -120,6 +124,7 @@ abstract mixin class $TranscribeRequestCopyWith<$Res> {
       bool diarize,
       bool speedUp,
       WhisperVadMode vadMode,
+      String? initialPrompt,
       String? vadModelPath,
       Stream<String>? realtimeStream});
 }
@@ -151,6 +156,7 @@ class _$TranscribeRequestCopyWithImpl<$Res>
     Object? diarize = null,
     Object? speedUp = null,
     Object? vadMode = null,
+    Object? initialPrompt = freezed,
     Object? vadModelPath = freezed,
     Object? realtimeStream = freezed,
   }) {
@@ -211,6 +217,10 @@ class _$TranscribeRequestCopyWithImpl<$Res>
           ? _self.vadMode
           : vadMode // ignore: cast_nullable_to_non_nullable
               as WhisperVadMode,
+      initialPrompt: freezed == initialPrompt
+          ? _self.initialPrompt
+          : initialPrompt // ignore: cast_nullable_to_non_nullable
+              as String?,
       vadModelPath: freezed == vadModelPath
           ? _self.vadModelPath
           : vadModelPath // ignore: cast_nullable_to_non_nullable
@@ -331,6 +341,7 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             bool diarize,
             bool speedUp,
             WhisperVadMode vadMode,
+            String? initialPrompt,
             String? vadModelPath,
             Stream<String>? realtimeStream)?
         $default, {
@@ -354,6 +365,7 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             _that.diarize,
             _that.speedUp,
             _that.vadMode,
+            _that.initialPrompt,
             _that.vadModelPath,
             _that.realtimeStream);
       case _:
@@ -391,6 +403,7 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             bool diarize,
             bool speedUp,
             WhisperVadMode vadMode,
+            String? initialPrompt,
             String? vadModelPath,
             Stream<String>? realtimeStream)
         $default,
@@ -413,6 +426,7 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             _that.diarize,
             _that.speedUp,
             _that.vadMode,
+            _that.initialPrompt,
             _that.vadModelPath,
             _that.realtimeStream);
       case _:
@@ -449,6 +463,7 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             bool diarize,
             bool speedUp,
             WhisperVadMode vadMode,
+            String? initialPrompt,
             String? vadModelPath,
             Stream<String>? realtimeStream)?
         $default,
@@ -471,6 +486,7 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             _that.diarize,
             _that.speedUp,
             _that.vadMode,
+            _that.initialPrompt,
             _that.vadModelPath,
             _that.realtimeStream);
       case _:
@@ -497,6 +513,7 @@ class _TranscribeRequest extends TranscribeRequest {
       this.diarize = false,
       this.speedUp = false,
       this.vadMode = WhisperVadMode.auto,
+      this.initialPrompt,
       this.vadModelPath,
       this.realtimeStream = null})
       : super._();
@@ -543,6 +560,8 @@ class _TranscribeRequest extends TranscribeRequest {
   @JsonKey()
   final WhisperVadMode vadMode;
   @override
+  final String? initialPrompt;
+  @override
   final String? vadModelPath;
   @override
   @JsonKey()
@@ -584,6 +603,8 @@ class _TranscribeRequest extends TranscribeRequest {
             (identical(other.diarize, diarize) || other.diarize == diarize) &&
             (identical(other.speedUp, speedUp) || other.speedUp == speedUp) &&
             (identical(other.vadMode, vadMode) || other.vadMode == vadMode) &&
+            (identical(other.initialPrompt, initialPrompt) ||
+                other.initialPrompt == initialPrompt) &&
             (identical(other.vadModelPath, vadModelPath) ||
                 other.vadModelPath == vadModelPath) &&
             (identical(other.realtimeStream, realtimeStream) ||
@@ -607,12 +628,13 @@ class _TranscribeRequest extends TranscribeRequest {
       diarize,
       speedUp,
       vadMode,
+      initialPrompt,
       vadModelPath,
       realtimeStream);
 
   @override
   String toString() {
-    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
+    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, initialPrompt: $initialPrompt, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
   }
 }
 
@@ -639,6 +661,7 @@ abstract mixin class _$TranscribeRequestCopyWith<$Res>
       bool diarize,
       bool speedUp,
       WhisperVadMode vadMode,
+      String? initialPrompt,
       String? vadModelPath,
       Stream<String>? realtimeStream});
 }
@@ -670,6 +693,7 @@ class __$TranscribeRequestCopyWithImpl<$Res>
     Object? diarize = null,
     Object? speedUp = null,
     Object? vadMode = null,
+    Object? initialPrompt = freezed,
     Object? vadModelPath = freezed,
     Object? realtimeStream = freezed,
   }) {
@@ -730,6 +754,10 @@ class __$TranscribeRequestCopyWithImpl<$Res>
           ? _self.vadMode
           : vadMode // ignore: cast_nullable_to_non_nullable
               as WhisperVadMode,
+      initialPrompt: freezed == initialPrompt
+          ? _self.initialPrompt
+          : initialPrompt // ignore: cast_nullable_to_non_nullable
+              as String?,
       vadModelPath: freezed == vadModelPath
           ? _self.vadModelPath
           : vadModelPath // ignore: cast_nullable_to_non_nullable

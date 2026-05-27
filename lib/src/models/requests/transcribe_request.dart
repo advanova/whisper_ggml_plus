@@ -22,6 +22,7 @@ abstract class TranscribeRequest with _$TranscribeRequest {
     @Default(false) bool diarize,
     @Default(false) bool speedUp,
     @Default(WhisperVadMode.auto) WhisperVadMode vadMode,
+    String? initialPrompt,
     String? vadModelPath,
     @Default(null) Stream<String>? realtimeStream,
   }) = _TranscribeRequest;
